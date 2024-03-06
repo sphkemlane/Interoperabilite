@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Albums</title>
+
+<style>
+    body {
+    font-family: Arial, sans-serif;
+    background-color: #0f0e0e;
+    margin: 0;
+    padding: 20px;
+    color: #ffffff; /* Blanc */
+
+}
+
+.container {
+    max-width: 1200px; /* Adjust this to match the max container width you want */
+    margin: auto;
+    padding: 20px;
+}
+
+.search-container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.search-container * {
+    margin: 5px;
+}
+
+#search-box {
+    flex-grow: 2; /* Allows the search box to take more space */
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+#search-button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* Style for checkbox labels and checkboxes */
+.search-container label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.search-container input[type="checkbox"] {
+    accent-color: #007bff; /* This is a simple way to change the checkbox color */
+    margin-right: 5px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .search-container {
+        justify-content: flex-start; /* Aligns items to the left on smaller screens */
+    }
+    #search-box {
+        flex-grow: 1; /* Allows the search box to shrink appropriately */
+        margin-right: 0; /* Removes margin to fit small screens */
+    }
+}
+
+.album-list ul {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* Creates four columns */
+    grid-gap: 20px; /* Adjust the gap between items */
+}
+
+.album-item {
+    background-color: #292525;
+    border: 1px solid #dee2e6;
+    padding: 15px;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    
+}
+
+.album-image {
+    width: 100%; /* This will make the image responsive to the container width */
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.album-info {
+    text-align: center;
+    
+}
+
+.album-info h2 {
+    font-size: 1em;
+    color: #f1f1f1;
+    margin: 10px 0;
+}
+
+.album-info p {
+    font-size: 0.9em;
+    color: #fdfeff;
+    margin: 5px 0;
+}
+
+</style>
+</head>
+<body>
+
+<div class="container">
+    
+    <div class="search-container">
+        <!-- Existing search box and button -->
+        <input type="text" id="search-box" placeholder="Search for albums...">
+        <button id="search-button">Search</button>
+        <!-- New checkboxes for sorting -->
+        <label>
+            <input type="checkbox" id="sort-asc" name="sort" value="asc">
+            Alphabetical
+        </label>
+        <label>
+            <input type="checkbox" id="sort-desc" name="sort" value="desc">
+            Reverse Alphabetical
+        </label>
+    </div>
+    
+    <!-- Rest of your HTML for the album list -->
+    
+
+    <div class="album-list">
+        <ul>       
+            <li th:each="album : ${albums}" class="album-item">
+                <img th:src="|data:image/jpeg;base64,${album.imageBase64}|" alt="Album Cover" class="album-image">
+                <div class="album-info">
+                    <h2 th:text="${album.title}">Album Title</h2>
+                    <p th:text="${album.artist}">Artist</p>
+                    <p th:text="${album.releaseYear}">Release Year</p>
+                </div>
+            </li>
+        </ul>
+    </div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchBox = document.getElementById('search-box');
+    const sortAscCheckbox = document.getElementById('sort-asc');
+    const sortDescCheckbox = document.getElementById('sort-desc');
+    const albumList = document.querySelector('.album-list ul');
+    const albumItems = document.querySelectorAll('.album-item');
+
+    // Function to update the album list based on the search criteria and sort order
+    function updateAlbumList() {
+        let filteredItems = Array.from(albumItems).filter(item => {
+            const title = item.querySelector('.album-info h2').textContent.toLowerCase();
+            return searchBox.value === '' || title.startsWith(searchBox.value.toLowerCase());
+        });
+
+        // Sort the filtered items if a sort checkbox is checked
+        if (sortAscCheckbox.checked) {
+            filteredItems.sort((a, b) => a.querySelector('.album-info h2').textContent.localeCompare(b.querySelector('.album-info h2').textContent));
+        } else if (sortDescCheckbox.checked) {
+            filteredItems.sort((a, b) => b.querySelector('.album-info h2').textContent.localeCompare(a.querySelector('.album-info h2').textContent));
+        }
+
+        // Clear out the current list and append the sorted/filtered items
+        albumList.innerHTML = '';
+        filteredItems.forEach(item => albumList.appendChild(item));
+    }
+
+    // Event listeners for the search box, sort checkboxes, and search button
+    searchBox.addEventListener('input', updateAlbumList);
+
+    sortAscCheckbox.addEventListener('change', () => {
+        sortDescCheckbox.checked = false;
+        updateAlbumList();
+    });
+
+    sortDescCheckbox.addEventListener('change', () => {
+        sortAscCheckbox.checked = false;
+        updateAlbumList();
+    });
+
+    document.getElementById('search-button').addEventListener('click', updateAlbumList);
+});
+
+</script>
+
+</body>
+</html>

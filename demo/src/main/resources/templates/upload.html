@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Data Extraction Tool</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #e9ecef;
+            color: #333;
+            line-height: 1.6;
+            padding: 10px;
+        }
+        
+        .container {
+            max-width: 700px;
+            margin: 30px auto;
+            overflow: hidden;
+            padding: 0 20px;
+        }
+        
+        .card {
+            background: #fff;
+            color: #333;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        
+        h2 {
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        input[type="file"],
+        input[type="text"] {
+            display: block;
+            width: 95%;
+            padding: 10px;
+            margin: 10px auto;
+            border: 1px solid #ccc;
+        }
+        
+        button {
+            display: block;
+            width: 40%;
+            padding: 10px;
+            margin: 10px auto;
+            background-color: #4CAF50;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+        }
+        
+        button:hover {
+            opacity: 0.8;
+        }
+        
+        /* Responsive layout */
+        @media(max-width: 768px) {
+            .container {
+                width: 95%;
+            }
+        
+            input[type="file"],
+            input[type="text"],
+            button {
+                width: 90%;
+            }
+        }
+        </style>
+        
+        
+</head>
+<body>
+<h1>Data Extraction </h1>
+
+<!-- Téléchargement de fichier PDF -->
+<h2>Upload PDF</h2>
+<form th:action="@{/upload}" method="post" enctype="multipart/form-data">
+    <input type="file" name="pdfFile" required />
+    <button type="submit">Upload PDF</button>
+</form>
+
+<!-- Extraction de base de données -->
+<h2>Extract from Database</h2>
+<form th:action="@{/upload/sql}" method="post" enctype="multipart/form-data">
+    <input type="file" name="file" required />
+    <button type="submit">Upload SQL</button>
+</form>
+
+
+<!-- Extraction depuis Wikipédia -->
+<h2>Extract from Wikipedia</h2>
+<form th:action="@{/upload/wiki}" method="post">
+    <input type="text" name="pageTitle" placeholder="Wikipedia Page Title" />
+    <button type="submit">Extract Data</button>
+</form>
+
+</body>
+</html>
