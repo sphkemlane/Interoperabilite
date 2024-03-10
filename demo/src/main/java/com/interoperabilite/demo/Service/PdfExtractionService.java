@@ -16,6 +16,12 @@ import com.interoperabilite.demo.Repository.AlbumRepository;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import javax.imageio.ImageIO;
 
@@ -33,70 +39,73 @@ public class PdfExtractionService {
         try {
             PDFTextStripper stripper = new PDFTextStripper();
             String text = stripper.getText(document);
-
-            // Split the text into lines
             String[] lines = text.split("\n");
-
-            // Temporary variables to store album information
+    
             String currentArtist = null;
-            String currentTitle = null;
-            int currentYear = -1;
-
-            // Process each line
+            List<Album> albumsToSave = new ArrayList<>();
+            int imageIndex = 0; // Keep track of the image index
+    
+            List<PDPage> pages = new ArrayList<>();
+            document.getDocumentCatalog().getPages().forEach(pages::add);
+    
+            Iterator<PDPage> pageIterator = pages.iterator();
+            PDPage currentPage = pageIterator.hasNext() ? pageIterator.next() : null;
+            PDResources pdResources = currentPage != null ? currentPage.getResources() : null;
+            Iterator<COSName> imageIterator = pdResources != null ? pdResources.getXObjectNames().iterator() : null;
+    
             for (String line : lines) {
+                line = line.trim();
                 if (line.startsWith("• Artiste :")) {
                     currentArtist = line.substring(line.indexOf(":") + 1).trim();
-                } else if (line.startsWith("Albums :")) {
-                    // Nothing to do here for now
                 } else if (line.startsWith("\"")) {
-                    // This line contains the album title and year
                     String[] parts = line.split("\"");
-                    currentTitle = parts[1].trim(); // The album title is the second part
-
-                    // Extract the year assuming it follows the title in parentheses
-                    String yearPart = parts[2].trim(); // The year is the third part after the title
-                    currentYear = Integer.parseInt(yearPart.substring(1, yearPart.length() - 1));
-
-                    // Create a new Album entity and save it
-                    Album album = new Album();
-                    album.setTitle(currentTitle);
-                    album.setArtist(currentArtist);
-                    album.setReleaseYear(currentYear);
-                    albumRepository.save(album);
+                    if (parts.length >= 3) {
+                        String currentTitle = parts[1].trim();
+                        String yearPart = parts[2].trim().replaceAll("[^\\d]", ""); // Remove non-digits
+                        int currentYear = Integer.parseInt(yearPart);
+    
+                        Album album = new Album();
+                        album.setTitle(currentTitle);
+                        album.setArtist(currentArtist);
+                        album.setReleaseYear(currentYear);
+                        albumsToSave.add(album);
+    
+                        System.out.println("Processing: Artist=" + currentArtist + ", Title=" + currentTitle + ", Year=" + currentYear);
+                    }
+                } else if (line.startsWith("Photo :") && imageIterator != null) {
+                    // Assign the image to the current album
+                    if (imageIterator.hasNext() && imageIndex < albumsToSave.size()) {
+                        COSName cosName = imageIterator.next();
+                        PDXObject xObject = pdResources.getXObject(cosName);
+                        if (xObject instanceof PDImageXObject) {
+                            PDImageXObject image = (PDImageXObject) xObject;
+                            BufferedImage bimage = image.getImage();
+                            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                            ImageIO.write(bimage, "jpg", baos);
+                            byte[] imageInByte = baos.toByteArray();
+    
+                            Album album = albumsToSave.get(imageIndex++);
+                            album.setImage(imageInByte);
+                            System.out.println("Assigned image to album: " + album.getTitle());
+                        }
+                    }
+                    if (!imageIterator.hasNext() && pageIterator.hasNext()) {
+                        currentPage = pageIterator.next();
+                        pdResources = currentPage.getResources();
+                        imageIterator = pdResources.getXObjectNames().iterator();
+                    }
                 }
             }
-
-            // Image extraction part
-            PDPage page = document.getPage(0); // Example for the first page
-            PDResources pdResources = page.getResources();
-            for (COSName c : pdResources.getXObjectNames()) {
-                PDXObject o = pdResources.getXObject(c);
-                if (o instanceof PDImageXObject) {
-                    PDImageXObject image = (PDImageXObject) o;
-                    BufferedImage bimage = image.getImage();
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    ImageIO.write(bimage, "jpg", baos);
-                    byte[] imageInByte = baos.toByteArray();
-
-                    // Logic to associate the image with a specific album
-                    // For example, if you have already extracted album information in the loop
-                    // above
-                    // You can now add the image to that album and save it
-                    Album album = new Album(); // Or retrieve an existing album
-                    album.setTitle(currentTitle);
-                    album.setArtist(currentArtist);
-                    album.setReleaseYear(currentYear);
-                    album.setImage(imageInByte); // Add the extracted image
-                    albumRepository.save(album);
-
-                    break; // Example for processing only one image, exit the loop after processing the
-                           // first image
-                }
-            }
+    
+            // Save all albums at once
+            albumRepository.saveAll(albumsToSave);
+    
+        } catch (IOException e) {
+            e.printStackTrace();
         } finally {
             if (document != null) {
                 document.close();
             }
         }
     }
-}
+}    
