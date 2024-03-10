@@ -112,6 +112,25 @@
     margin: 5px 0;
 }
 
+#search-date {
+    padding: 8px 12px;
+    width: 30%; /* Ajuste la largeur pour s'adapter à son conteneur */
+    border: 1px solid #ccc; /* Bordure légère pour un look épuré */
+    border-radius: 4px; /* Bords arrondis pour une apparence douce */
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1); /* Ombre interne subtile pour la profondeur */
+    transition: border-color 0.2s, box-shadow 0.2s; /* Transition fluide pour les interactions */
+    outline: none; /* Supprime le contour bleu par défaut lors du focus */
+    font-size: 16px; /* Taille de la police confortable pour la lecture */
+    color: #333; /* Couleur du texte sombre pour une bonne lisibilité */
+}
+
+#search-date:focus {
+    border-color: #007bff; /* Couleur de la bordure au focus pour l'accentuation */
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 8px rgba(0, 123, 255, 0.6); /* Ombre plus prononcée au focus */
+}
+
+
+
 </style>
 </head>
 <body>
@@ -137,6 +156,8 @@
     
 
     <div class="album-list">
+        <input type="text" id="search-date" placeholder="Recherche par année de sortie">
+
         <ul>       
             <li th:each="album : ${albums}" class="album-item">
                 <img th:src="|data:image/jpeg;base64,${album.imageBase64}|" alt="Album Cover" class="album-image">
@@ -150,49 +171,53 @@
     </div>
 </div>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const searchBox = document.getElementById('search-box');
-    const sortAscCheckbox = document.getElementById('sort-asc');
-    const sortDescCheckbox = document.getElementById('sort-desc');
-    const albumList = document.querySelector('.album-list ul');
-    const albumItems = document.querySelectorAll('.album-item');
-
-    // Function to update the album list based on the search criteria and sort order
-    function updateAlbumList() {
-        let filteredItems = Array.from(albumItems).filter(item => {
-            const title = item.querySelector('.album-info h2').textContent.toLowerCase();
-            return searchBox.value === '' || title.startsWith(searchBox.value.toLowerCase());
-        });
-
-        // Sort the filtered items if a sort checkbox is checked
-        if (sortAscCheckbox.checked) {
-            filteredItems.sort((a, b) => a.querySelector('.album-info h2').textContent.localeCompare(b.querySelector('.album-info h2').textContent));
-        } else if (sortDescCheckbox.checked) {
-            filteredItems.sort((a, b) => b.querySelector('.album-info h2').textContent.localeCompare(a.querySelector('.album-info h2').textContent));
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchBox = document.getElementById('search-box');
+        const searchDate = document.getElementById('search-date'); // Input for searching by date
+        const sortAscCheckbox = document.getElementById('sort-asc');
+        const sortDescCheckbox = document.getElementById('sort-desc');
+        const albumList = document.querySelector('.album-list ul');
+        const albumItems = document.querySelectorAll('.album-item');
+    
+        function updateAlbumList() {
+            let filteredItems = Array.from(albumItems).filter(item => {
+                const title = item.querySelector('.album-info h2').textContent.toLowerCase();
+                const artist = item.querySelector('.album-info p:nth-child(2)').textContent.toLowerCase(); // Adjusted for artist being the second <p> element
+                const releaseYear = item.querySelector('.album-info p:nth-child(3)').textContent; // Assuming release year is the third <p> element
+                const searchTerm = searchBox.value.toLowerCase();
+                const searchYear = searchDate.value;
+                // Checks if the title, artist, or release year matches the search terms
+                return (searchTerm === '' || title.includes(searchTerm) || artist.includes(searchTerm)) && 
+                       (searchYear === '' || releaseYear.includes(searchYear));
+            });
+    
+            if (sortAscCheckbox.checked) {
+                filteredItems.sort((a, b) => a.querySelector('.album-info h2').textContent.localeCompare(b.querySelector('.album-info h2').textContent));
+            } else if (sortDescCheckbox.checked) {
+                filteredItems.sort((a, b) => b.querySelector('.album-info h2').textContent.localeCompare(a.querySelector('.album-info h2').textContent));
+            }
+    
+            albumList.innerHTML = '';
+            filteredItems.forEach(item => albumList.appendChild(item));
         }
-
-        // Clear out the current list and append the sorted/filtered items
-        albumList.innerHTML = '';
-        filteredItems.forEach(item => albumList.appendChild(item));
-    }
-
-    // Event listeners for the search box, sort checkboxes, and search button
-    searchBox.addEventListener('input', updateAlbumList);
-
-    sortAscCheckbox.addEventListener('change', () => {
-        sortDescCheckbox.checked = false;
-        updateAlbumList();
+    
+        searchBox.addEventListener('input', updateAlbumList);
+        searchDate.addEventListener('input', updateAlbumList); // Add event listener for the date input
+    
+        sortAscCheckbox.addEventListener('change', () => {
+            sortDescCheckbox.checked = false;
+            updateAlbumList();
+        });
+    
+        sortDescCheckbox.addEventListener('change', () => {
+            sortAscCheckbox.checked = false;
+            updateAlbumList();
+        });
+    
+        document.getElementById('search-button').addEventListener('click', updateAlbumList);
     });
-
-    sortDescCheckbox.addEventListener('change', () => {
-        sortAscCheckbox.checked = false;
-        updateAlbumList();
-    });
-
-    document.getElementById('search-button').addEventListener('click', updateAlbumList);
-});
-
-</script>
+    </script>
+    
 
 </body>
 </html>
