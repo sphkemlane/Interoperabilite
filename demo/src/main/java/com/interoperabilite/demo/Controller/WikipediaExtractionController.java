@@ -1,35 +1,38 @@
 package com.interoperabilite.demo.Controller;
 
-
+import com.interoperabilite.demo.Model.ArtistInfo;
+import com.interoperabilite.demo.Repository.ArtistInfoRepository;
 import com.interoperabilite.demo.Service.WikipediaExtractionService;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class WikipediaExtractionController {
 
     private final WikipediaExtractionService wikipediaExtractionService;
+    private final ArtistInfoRepository artistInfoRepository; // Supposons que cela existe pour le stockage des données
 
-    @Autowired
-    public WikipediaExtractionController(WikipediaExtractionService wikipediaExtractionService) {
+    public WikipediaExtractionController(WikipediaExtractionService wikipediaExtractionService,
+            ArtistInfoRepository artistInfoRepository) {
         this.wikipediaExtractionService = wikipediaExtractionService;
+        this.artistInfoRepository = artistInfoRepository;
     }
 
     @PostMapping("/upload/wiki")
-    public String handleWikiExtract(@RequestParam("pageTitle") String pageTitle, RedirectAttributes redirectAttributes) {
-        try {
-            wikipediaExtractionService.extractAndStoreWikiInfo(pageTitle);
+    public String handleWikiExtract(@RequestParam("pageTitle") String pageTitle,
+            RedirectAttributes redirectAttributes) {
+        ArtistInfo artistInfo = wikipediaExtractionService.extractArtistInfoFromWikipedia(pageTitle);
+        if (artistInfo != null) {
+            artistInfoRepository.save(artistInfo);
             redirectAttributes.addFlashAttribute("message", "Data extracted successfully from Wikipedia!");
             return "redirect:/uploadSuccess";
-        } catch (Exception e) {
-            e.printStackTrace();
-            redirectAttributes.addFlashAttribute("message", "Failed to extract data from Wikipedia: " + e.getMessage());
+        } else {
+            redirectAttributes.addFlashAttribute("message", "Failed to extract data from Wikipedia.");
             return "redirect:/uploadFail";
         }
-    }
 
-    // Assurez-vous d'avoir une page 'uploadSuccess.html' et 'uploadFail.html' dans 'src/main/resources/templates'
+    }
 }

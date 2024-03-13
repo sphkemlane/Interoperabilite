@@ -47,4 +47,9 @@ public class PdfUploadController {
     public String uploadSuccess() {
         return "uploadSuccess"; // Nom du fichier HTML affichant le succès du téléchargement et l'extraction
     }
+
+    @GetMapping("/uploadFail")
+    public String uploadFail() {
+        return "uploadFail";
+    }
 }

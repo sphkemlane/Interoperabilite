@@ -1,61 +1,68 @@
 package com.interoperabilite.demo.Service;
 
-import java.nio.charset.StandardCharsets;
-
-import org.apache.catalina.util.URLEncoder;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.interoperabilite.demo.Model.Album;
-import com.interoperabilite.demo.Repository.AlbumRepository;
+import com.interoperabilite.demo.Model.ArtistInfo;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 @Service
 public class WikipediaExtractionService {
 
     private final RestTemplate restTemplate;
-    private final AlbumRepository albumRepository; // Repositoire pour enregistrer les données
 
     @Autowired
-    public WikipediaExtractionService(RestTemplateBuilder restTemplateBuilder, AlbumRepository albumRepository) {
-        this.restTemplate = restTemplateBuilder.build();
-        this.albumRepository = albumRepository;
+    public WikipediaExtractionService(RestTemplate restTemplate) {
+
+        this.restTemplate = restTemplate;
     }
 
-    public void extractAndStoreWikiInfo(String pageTitle) {
-        String encodedPageTitle = new org.apache.catalina.util.URLEncoder().encode(pageTitle, StandardCharsets.UTF_8);
-        String wikiApiUrl = "https://en.wikipedia.org/api/rest_v1/page/summary/" + encodedPageTitle;
-
-        // Faire l'appel au service Wikipedia
-        ResponseEntity<String> response = restTemplate.getForEntity(wikiApiUrl, String.class);
-        String wikidataId = parseWikiResponse(response.getBody());
-
-        // Stocker l'information extraite dans la base de données
-        Album album = new Album();
-        album.setWikidataId(wikidataId);
-        // Ajoutez d'autres informations au besoin
-        albumRepository.save(album);
-    }
-
-    private String parseWikiResponse(String responseBody) {
+    public ArtistInfo extractArtistInfoFromWikipedia(String pageTitle) {
         try {
-            // Convertir la réponse JSON en objet Java avec Jackson
-            ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode rootNode = objectMapper.readTree(responseBody);
+            // Ensure the pageTitle is just the title, not a URL
 
-            // Obtenir le Wikidata ID de l'objet JSON
-            // Note : le chemin exact pour accéder à l'ID Wikidata dépend de la structure de
-            // la réponse de l'API
-            JsonNode wikiDataIdNode = rootNode.path("wikibase_item");
-            return wikiDataIdNode.asText();
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            return null;
+            String safeTitle = pageTitle.replace(" ", "_");
+            String apiUrl = String.format(
+                    "https://fr.wikipedia.org/w/api.php?action=query&titles=%s&prop=revisions&rvprop=content&format=json",
+                    safeTitle);
+
+            ResponseEntity<String> response = restTemplate.getForEntity(apiUrl, String.class);
+            System.out.println("Requesting URL: " + apiUrl);
+
+            if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
+                String htmlContent = response.getBody();
+                Document doc = Jsoup.parse(htmlContent);
+
+                String birthDate = doc.select("th:contains(Naissance) + td").text();
+                String realName = doc.select("th:contains(Nom de naissance) + td").text();
+                String nationality = doc.select("th:contains(Nationalité) + td").text();
+                String occupation = doc.select("th:contains(Activités) + td").text();
+                String label = doc.select("th:contains(Label) + td").text();
+                String artisticGenre = doc.select("th:contains(Genre artistique) + td").text();
+
+                return new ArtistInfo(birthDate, realName, nationality, occupation, label, artisticGenre);
+
+            } else {
+                // Handle non-successful response or missing body
+                System.out.println(
+                        "Received non-success response from Wikipedia or body is missing for page: " + pageTitle);
+                return null; // or throw a custom exception
+            }
+        } catch (HttpClientErrorException e) {
+            // Handle the 404 Not Found exception specifically
+            System.err.println("Wikipedia page not found for title: " + pageTitle + ", error: " + e.getMessage());
+            return null; // or throw a custom exception
+        } catch (Exception e) {
+            // Handle other exceptions
+            System.err.println("An error occurred while extracting information from Wikipedia for title: " + pageTitle
+                    + ", error: " + e.getMessage());
+            return null; // or throw a custom exception
         }
     }
+
 }
