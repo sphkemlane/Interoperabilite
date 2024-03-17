@@ -33,6 +33,12 @@ public class ArtistInfo {
     @Column(name = "artistic_genre")
     private String artisticGenre;
 
+    @Column(name = "wikidata_id")
+    private String wikidataId;
+
+    @Column(name = "dbpedia_id")
+    private String dbpediaId;
+
     // Standard getters and setters
 
     // Ajout d'un constructeur par défaut
@@ -41,13 +47,15 @@ public class ArtistInfo {
 
     // Constructeur avec paramètres
     public ArtistInfo(String birthDate, String realName, String nationality, String occupation, String label,
-            String artisticGenre) {
+            String artisticGenre , String wikidataId, String dbpediaId ) {
         this.birthDate = birthDate;
         this.realName = realName;
         this.nationality = nationality;
         this.occupation = occupation;
         this.label = label;
         this.artisticGenre = artisticGenre;
+        this.wikidataId = wikidataId;
+        this.dbpediaId = dbpediaId;
     }
 
     // Reste de la classe (getters, setters, toString)
