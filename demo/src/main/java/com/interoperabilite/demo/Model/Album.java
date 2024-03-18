@@ -31,6 +31,17 @@ public class Album {
     @Column(name = "image", columnDefinition = "BLOB")
     private byte[] image;
 
+    @Column(name = "dbpedia_id")
+    private String dbpediaId;
+
+    public String getDbpediaId() {
+        return dbpediaId;
+    }
+
+    public void setDbpediaId(String dbpediaId) {
+        this.dbpediaId = dbpediaId;
+    }
+
     // Default constructor is required by JPA
     public Album() {
     }
@@ -90,8 +101,8 @@ public class Album {
     public void setReleaseYear(Integer releaseYear) {
         this.releaseYear = releaseYear;
     }
-    private String wikidataId;
 
+    private String wikidataId;
 
     public String getWikidataId() {
         return wikidataId;
@@ -100,7 +111,6 @@ public class Album {
     public void setWikidataId(String wikidataId) {
         this.wikidataId = wikidataId;
     }
-
 
     // toString, equals, and hashCode methods
 

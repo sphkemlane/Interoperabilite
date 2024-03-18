@@ -39,7 +39,20 @@ public class ArtistInfo {
     @Column(name = "dbpedia_id")
     private String dbpediaId;
 
-    // Standard getters and setters
+    public String getWikidataId() {
+        return wikidataId;
+    }
+
+    public void setWikidataId(String wikidataId) {
+        this.wikidataId = wikidataId;
+    }
+    public String getDbpediaId() {
+        return dbpediaId;
+    }
+    
+    public void setDbpediaId(String dbpediaId) {
+        this.dbpediaId = dbpediaId;
+    }
 
     // Ajout d'un constructeur par défaut
     public ArtistInfo() {
@@ -47,7 +60,7 @@ public class ArtistInfo {
 
     // Constructeur avec paramètres
     public ArtistInfo(String birthDate, String realName, String nationality, String occupation, String label,
-            String artisticGenre , String wikidataId, String dbpediaId ) {
+            String artisticGenre, String wikidataId, String dbpediaId) {
         this.birthDate = birthDate;
         this.realName = realName;
         this.nationality = nationality;
