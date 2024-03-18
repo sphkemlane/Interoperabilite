@@ -22,23 +22,23 @@ public class DatabaseExtractionController {
     public String handleSqlUpload(@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes) {
         if (file.isEmpty()) {
             redirectAttributes.addFlashAttribute("message", "Please select a SQL file to upload.");
-            return "redirect:/uploadForm"; // Assurez-vous d'avoir une route pour revenir au formulaire d'upload
+            return "redirect:/uploadForm";
         }
         try {
             databaseExtractionService.executeSqlScript(file);
             redirectAttributes.addFlashAttribute("message", "SQL script executed successfully!");
-            return "redirect:/uploadSuccess"; // Redirection après succès
+            return "redirect:/uploadSuccess";
 
         } catch (Exception e) {
             e.printStackTrace();
             redirectAttributes.addFlashAttribute("message", "Failed to execute SQL script: " + e.getMessage());
-            return "redirect:/uploadForm"; // Redirige vers le formulaire d'upload en cas d'échec
+            return "redirect:/uploadForm";
         }
     }
 
     @GetMapping("/uploadsqlSuccess")
     public String uploadSuccess() {
-        return "uploadSuccess"; // Assurez-vous que le fichier uploadSuccess.html est dans
-                                // src/main/resources/templates
+        return "uploadSuccess";
+
     }
 }

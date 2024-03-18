@@ -13,7 +13,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class WikipediaExtractionController {
 
     private final WikipediaExtractionService wikipediaExtractionService;
-    private final ArtistInfoRepository artistInfoRepository; // Supposons que cela existe pour le stockage des données
+    private final ArtistInfoRepository artistInfoRepository;
 
     public WikipediaExtractionController(WikipediaExtractionService wikipediaExtractionService,
             ArtistInfoRepository artistInfoRepository) {

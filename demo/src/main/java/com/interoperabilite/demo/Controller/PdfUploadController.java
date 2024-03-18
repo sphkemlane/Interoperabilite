@@ -19,13 +19,11 @@ public class PdfUploadController {
         this.PdfExtractionService = PdfExtractionService;
     }
 
-    // Point d'entrée pour le formulaire de téléchargement
     @GetMapping("/upload")
     public String showUploadForm() {
-        return "upload"; // Nom du fichier HTML pour le formulaire de téléchargement
+        return "upload";
     }
 
-    // Gestion du téléchargement et de l'extraction
     @PostMapping("/upload")
     public String handlePdfUpload(@RequestParam("pdfFile") MultipartFile file, RedirectAttributes redirectAttributes) {
         if (!file.isEmpty()) {
@@ -42,10 +40,9 @@ public class PdfUploadController {
         return "redirect:/uploadSuccess";
     }
 
-    // Page de succès montrant le résultat de l'extraction
     @GetMapping("/uploadSuccess")
     public String uploadSuccess() {
-        return "uploadSuccess"; // Nom du fichier HTML affichant le succès du téléchargement et l'extraction
+        return "uploadSuccess";
     }
 
     @GetMapping("/uploadFail")

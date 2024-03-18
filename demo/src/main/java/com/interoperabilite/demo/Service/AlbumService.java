@@ -1,6 +1,5 @@
 package com.interoperabilite.demo.Service;
 
-
 import com.interoperabilite.demo.Model.Album;
 import com.interoperabilite.demo.Repository.AlbumRepository;
 import org.springframework.stereotype.Service;
@@ -24,5 +23,4 @@ public class AlbumService {
         return albumRepository.save(album);
     }
 
-    // Autres méthodes utiles...
 }

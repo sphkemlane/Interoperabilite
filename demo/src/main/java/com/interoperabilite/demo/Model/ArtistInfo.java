@@ -46,15 +46,15 @@ public class ArtistInfo {
     public void setWikidataId(String wikidataId) {
         this.wikidataId = wikidataId;
     }
+
     public String getDbpediaId() {
         return dbpediaId;
     }
-    
+
     public void setDbpediaId(String dbpediaId) {
         this.dbpediaId = dbpediaId;
     }
 
-    // Ajout d'un constructeur par défaut
     public ArtistInfo() {
     }
 
@@ -71,5 +71,4 @@ public class ArtistInfo {
         this.dbpediaId = dbpediaId;
     }
 
-    // Reste de la classe (getters, setters, toString)
 }

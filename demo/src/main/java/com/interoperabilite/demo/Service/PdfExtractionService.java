@@ -45,7 +45,7 @@ public class PdfExtractionService {
 
             String currentArtist = null;
             List<Album> albumsToSave = new ArrayList<>();
-            int imageIndex = 0; // Keep track of the image index
+            int imageIndex = 0;
 
             List<PDPage> pages = new ArrayList<>();
             document.getDocumentCatalog().getPages().forEach(pages::add);
@@ -67,8 +67,8 @@ public class PdfExtractionService {
                                 ", Dbpedia ID: " + artistInfo.getDbpediaId());
                         // Mise à jour des ID courants
                         currentWikidataId = artistInfo.getWikidataId();
-                        currentDbpediaId = artistInfo.getDbpediaId(); // Assurez-vous que cette méthode existe et
-                                                                      // fonctionne
+                        currentDbpediaId = artistInfo.getDbpediaId();
+
                     } else {
                         System.out.println("Artist not found on Wikipedia: " + currentArtist);
                         // Réinitialisez si l'artiste n'est pas trouvé
@@ -80,7 +80,7 @@ public class PdfExtractionService {
                     String[] parts = line.split("\"");
                     if (parts.length >= 3) {
                         String currentTitle = parts[1].trim();
-                        String yearPart = parts[2].trim().replaceAll("[^\\d]", ""); // Remove non-digits
+                        String yearPart = parts[2].trim().replaceAll("[^\\d]", "");
                         int currentYear = Integer.parseInt(yearPart);
 
                         Album album = new Album();
@@ -88,7 +88,7 @@ public class PdfExtractionService {
                         album.setArtist(currentArtist);
                         album.setReleaseYear(currentYear);
                         album.setWikidataId(currentWikidataId);
-                        album.setDbpediaId(currentDbpediaId); // Ajoutez le Dbpedia ID ici
+                        album.setDbpediaId(currentDbpediaId);
 
                         albumsToSave.add(album);
                         System.out.println("Processing: Artist=" + currentArtist + ", Title=" + currentTitle + ", Year="

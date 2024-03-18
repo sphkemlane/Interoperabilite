@@ -31,15 +31,11 @@ public class WikipediaExtractionService {
         try {
             String titleOfPage = pageTitle.substring(pageTitle.lastIndexOf("/") + 1);
             String safeTitle = URLEncoder.encode(titleOfPage, StandardCharsets.UTF_8.toString());
-            // Correction de l'utilisation de String.format ici, car safeTitle n'est pas
-            // utilisé dans le formatage.
             String apiUrl = "https://fr.wikipedia.org/w/api.php?action=parse&page=" + safeTitle
                     + "&prop=text|pageprops&format=json";
 
             ResponseEntity<String> response = restTemplate.getForEntity(apiUrl, String.class);
 
-            // Déclarez wikidataId et dbpediaId en dehors des blocs conditionnels pour
-            // garantir leur accessibilité.
             String wikidataId = "";
             String dbpediaTitle = titleOfPage.replace(" ", "_");
             String dbpediaId = "http://fr.dbpedia.org/resource/" + dbpediaTitle;
@@ -74,7 +70,7 @@ public class WikipediaExtractionService {
                     }
                 }
                 String formattedTitle = titleOfPage.replace(" ", "_");
-                dbpediaId =     formattedTitle;
+                dbpediaId = formattedTitle;
 
                 // Création de l'objet ArtistInfo avec toutes les informations extraites
                 return new ArtistInfo(birthDate, realName, nationality, occupation, label, artisticGenre, wikidataId,

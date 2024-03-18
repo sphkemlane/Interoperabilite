@@ -26,7 +26,7 @@ public class DatabaseExtractionService {
     private WikipediaExtractionService wikipediaExtractionService;
 
     @Autowired
-    private AlbumRepository albumRepository; // Injection de AlbumRepository
+    private AlbumRepository albumRepository;
 
     @Transactional
     public void executeSqlScript(MultipartFile sqlFile) throws IOException {
@@ -38,28 +38,27 @@ public class DatabaseExtractionService {
                 entityManager.createNativeQuery(instruction).executeUpdate();
             }
         }
-        // L'appel pour mettre à jour les albums avec les ID Wikidata est correct ici.
         updateAlbumsWithWikidataIds();
     }
+
     @Transactional
     public void updateAlbumsWithWikidataIds() {
         List<Album> albums = albumRepository.findAll(); // Récupère tous les albums
-    
+
         for (Album album : albums) {
-            if ((album.getWikidataId() == null || album.getWikidataId().isEmpty()) || 
-                (album.getDbpediaId() == null || album.getDbpediaId().isEmpty())) {
-                // Supposons que extractArtistInfoFromWikipedia retourne maintenant aussi le dbpediaId
+            if ((album.getWikidataId() == null || album.getWikidataId().isEmpty()) ||
+                    (album.getDbpediaId() == null || album.getDbpediaId().isEmpty())) {
                 ArtistInfo artistInfo = wikipediaExtractionService.extractArtistInfoFromWikipedia(album.getArtist());
                 if (artistInfo != null) {
                     if (artistInfo.getWikidataId() != null) {
                         album.setWikidataId(artistInfo.getWikidataId());
                     }
-                    if (artistInfo.getDbpediaId() != null) { // Supposons qu'il y a maintenant un getDbpediaId
+                    if (artistInfo.getDbpediaId() != null) {
                         album.setDbpediaId(artistInfo.getDbpediaId());
                     }
-                    albumRepository.save(album); // Sauvegarde de l'album mis à jour
+                    albumRepository.save(album);
                 }
             }
         }
     }
-}    
+}

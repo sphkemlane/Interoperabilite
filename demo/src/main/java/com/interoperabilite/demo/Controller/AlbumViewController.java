@@ -22,6 +22,6 @@ public class AlbumViewController {
     public String showAlbumsPage(Model model) {
         List<Album> albums = albumRepository.findAll();
         model.addAttribute("albums", albums);
-        return "albums"; // Assurez-vous que le fichier albums.html est dans src/main/resources/templates
+        return "albums";
     }
 }

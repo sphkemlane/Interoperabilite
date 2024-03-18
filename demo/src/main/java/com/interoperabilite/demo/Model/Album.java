@@ -42,11 +42,9 @@ public class Album {
         this.dbpediaId = dbpediaId;
     }
 
-    // Default constructor is required by JPA
     public Album() {
     }
 
-    // Constructor with parameters
     public Album(String title, String artist, Integer releaseYear) {
         this.title = title;
         this.artist = artist;
@@ -112,8 +110,6 @@ public class Album {
         this.wikidataId = wikidataId;
     }
 
-    // toString, equals, and hashCode methods
-
     @Override
     public String toString() {
         return "Album{" +
@@ -124,6 +120,4 @@ public class Album {
                 '}';
     }
 
-    // Implement equals and hashCode based on the id field
-    // ...
 }
