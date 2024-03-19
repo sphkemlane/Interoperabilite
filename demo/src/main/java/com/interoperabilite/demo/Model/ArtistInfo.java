@@ -18,6 +18,62 @@ public class ArtistInfo {
     @Column(name = "birth_date")
     private String birthDate;
 
+    public Long getId() {
+        return this.id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getBirthDate() {
+        return this.birthDate;
+    }
+
+    public void setBirthDate(String birthDate) {
+        this.birthDate = birthDate;
+    }
+
+    public String getRealName() {
+        return this.realName;
+    }
+
+    public void setRealName(String realName) {
+        this.realName = realName;
+    }
+
+    public String getNationality() {
+        return this.nationality;
+    }
+
+    public void setNationality(String nationality) {
+        this.nationality = nationality;
+    }
+
+    public String getOccupation() {
+        return this.occupation;
+    }
+
+    public void setOccupation(String occupation) {
+        this.occupation = occupation;
+    }
+
+    public String getLabel() {
+        return this.label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
+    public String getArtisticGenre() {
+        return this.artisticGenre;
+    }
+
+    public void setArtisticGenre(String artisticGenre) {
+        this.artisticGenre = artisticGenre;
+    }
+
     @Column(name = "real_name")
     private String realName;
 

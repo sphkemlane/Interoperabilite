@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Albums</title>
+
+<style>
+    body {
+    font-family: Arial, sans-serif;
+    background-color: #0f0e0e;
+    margin: 0;
+    padding: 20px;
+    color: #ffffff; /* Blanc */
+
+}
+
+.container {
+    max-width: 800px;
+    margin: auto;
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.artist-list h2 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+.artist-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.artist-info {
+    margin-left: 15px;
+}
+
+.artist-info h3 {
+    margin-top: 0;
+    color: #007BFF;
+}
+
+.artist-info p {
+    margin: 5px 0;
+    font-size: 0.9em;
+    color: #666;
+}
+
+/* Style pour Wikidata et DBpedia ID pour les distinguer */
+.artist-info p:nth-last-child(2),
+.artist-info p:last-child {
+    font-weight: bold;
+    color: #333;
+}
+
+
+
+
+</style>
+</head>
+<body>
+
+    
+   
+    <!-- Rest of your HTML for the album list -->
+    
+
+  
+
+    <div class="container">
+        <div class="artist-list">
+            <h2>Artistes:</h2>
+            <ul>
+                <li th:each="artist : ${artists}" class="artist-item">
+                    <div class="artist-info">
+                        <h3 th:text="${artist.realName}">Nom de l'Artiste</h3>
+                        <p th:text="'Date de Naissance: ' + ${artist.birthDate}">Date de Naissance</p>
+                        <p th:text="'Nationalité: ' + ${artist.nationality}">Nationalité</p>
+                        <p th:text="'Occupation: ' + ${artist.occupation}">Occupation</p>
+                        <p th:text="'Genre Artistique: ' + ${artist.artisticGenre}">Genre Artistique</p>
+                        <p>Wikidata ID: <a th:href="@{'https://www.wikidata.org/wiki/' + ${artist.wikidataId}}" th:text="${artist.wikidataId}" target="_blank"></a></p>
+
+                        <p>DBpedia ID: <a th:href="@{'https://dbpedia.org/page/' + ${artist.dbpediaId}}" th:text="${artist.dbpediaId}" target="_blank"></a></p>
+
+                    </div>
+                </li>
+            </ul>
+    </div>
+    
+    
+    
+
+    
+
+</body>
+</html>

@@ -131,6 +131,7 @@
 
 
 
+
 </style>
 </head>
 <body>
@@ -165,10 +166,20 @@
                     <h2 th:text="${album.title}">Album Title</h2>
                     <p th:text="${album.artist}">Artist</p>
                     <p th:text="${album.releaseYear}">Release Year</p>
+                    <p>Wikidata ID: <a th:href="@{'https://www.wikidata.org/wiki/' + ${album.wikidataId}}" th:text="${album.wikidataId}" target="_blank"></a></p>
+
+                    <p>DBpedia ID: <a th:href="@{'https://dbpedia.org/page/' + ${album.dbpediaId}}" th:text="${album.dbpediaId}" target="_blank"></a></p>
+
                 </div>
             </li>
         </ul>
+
+       
     </div>
+  
+    
+    
+    
 </div>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
